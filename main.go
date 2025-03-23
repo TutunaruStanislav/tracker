@@ -97,73 +97,76 @@ func (s ParcelService) Delete(number int) error {
 }
 
 func main() {
-	// настройте подключение к БД
+	db, err := sql.Open("sqlite", "tracker.db")
+	if err != nil {
+		panic(err)
+	}
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	store := NewParcelStore(db)
 	service := NewParcelService(store)
 
-	// регистрация посылки
+	// registering parcel
 	client := 1
 	address := "Псков, д. Пушкина, ул. Колотушкина, д. 5"
-	p, err := service.Register(client, address)
+	parcel, err := service.Register(client, address)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// изменение адреса
+	// changing parcel address
 	newAddress := "Саратов, д. Верхние Зори, ул. Козлова, д. 25"
-	err = service.ChangeAddress(p.Number, newAddress)
+	err = service.ChangeAddress(parcel.Number, newAddress)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// изменение статуса
-	err = service.NextStatus(p.Number)
+	// changing parcel status
+	err = service.NextStatus(parcel.Number)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// вывод посылок клиента
+	// returning customer parcels
 	err = service.PrintClientParcels(client)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// попытка удаления отправленной посылки
-	err = service.Delete(p.Number)
+	// attempt to delete shipped parcel
+	err = service.Delete(parcel.Number)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// вывод посылок клиента
-	// предыдущая посылка не должна удалиться, т.к. её статус НЕ «зарегистрирована»
+	// returning customer parcels
+	// the previous parcel should not be deleted because its status is NOT “registered”
 	err = service.PrintClientParcels(client)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// регистрация новой посылки
-	p, err = service.Register(client, address)
+	// registering new parcel
+	parcel, err = service.Register(client, address)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// удаление новой посылки
-	err = service.Delete(p.Number)
+	// deletion new parcel
+	err = service.Delete(parcel.Number)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	// вывод посылок клиента
-	// здесь не должно быть последней посылки, т.к. она должна была успешно удалиться
+	// returning customer parcels
+	// there should be no last parcel here, as it should have been successfully deleted
 	err = service.PrintClientParcels(client)
 	if err != nil {
 		fmt.Println(err)
