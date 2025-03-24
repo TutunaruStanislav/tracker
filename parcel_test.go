@@ -51,7 +51,8 @@ func TestAddGetDelete(t *testing.T) {
 	err = store.Delete(id)
 	require.NoError(t, err)
 	_, err = store.Get(id)
-	require.Equal(t, sql.ErrNoRows, err)
+	require.Error(t, err)
+	assert.ErrorIs(t, sql.ErrNoRows, err)
 }
 
 // TestSetAddress checks an address updating
@@ -128,7 +129,7 @@ func TestGetByClient(t *testing.T) {
 	for i := 0; i < len(parcels); i++ {
 		id, err := store.Add(parcels[i])
 		require.NoError(t, err)
-		assert.NotEmpty(t, id)
+		require.NotEmpty(t, id)
 
 		parcels[i].Number = id
 
@@ -138,15 +139,12 @@ func TestGetByClient(t *testing.T) {
 	// get by client
 	storedParcels, err := store.GetByClient(client)
 	require.NoError(t, err)
-	assert.Equal(t, len(parcelMap), len(storedParcels))
+	assert.Len(t, parcelMap, len(storedParcels))
 
 	// check
 	for _, parcel := range storedParcels {
 		cached, ok := parcelMap[parcel.Number]
 		assert.True(t, ok)
-		assert.Equal(t, cached.Client, parcel.Client)
-		assert.Equal(t, cached.Status, parcel.Status)
-		assert.Equal(t, cached.Address, parcel.Address)
-		assert.Equal(t, cached.CreatedAt, parcel.CreatedAt)
+		assert.Equal(t, cached, parcel)
 	}
 }
