@@ -37,11 +37,12 @@ func TestAddGetDelete(t *testing.T) {
 	// add
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	assert.NotEmpty(t, id)
+	require.NotEmpty(t, id)
 
 	// get
 	got, err := store.Get(id)
 	require.NoError(t, err)
+	assert.Equal(t, parcel.Number, got.Number)
 	assert.Equal(t, parcel.Client, got.Client)
 	assert.Equal(t, parcel.Status, got.Status)
 	assert.Equal(t, parcel.Address, got.Address)
@@ -67,7 +68,7 @@ func TestSetAddress(t *testing.T) {
 	// add
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	assert.NotEmpty(t, id)
+	require.NotEmpty(t, id)
 
 	// set address
 	newAddress := "new test address"
@@ -92,7 +93,7 @@ func TestSetStatus(t *testing.T) {
 	// add
 	id, err := store.Add(parcel)
 	require.NoError(t, err)
-	assert.NotEmpty(t, id)
+	require.NotEmpty(t, id)
 
 	// set status
 	newStatus := ParcelStatusSent
